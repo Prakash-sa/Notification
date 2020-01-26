@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
+import androidx.core.app.ShareCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 
@@ -95,11 +96,15 @@ import java.io.File;
         String path;
         mNotifyManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         File file = new File("/storage/emulated/0/DCIM/Camera/PNG_20200125_225503_8146128494111396969.png"); //
-        Intent intent = new Intent();
-        intent.setAction(Intent.ACTION_VIEW);
+        //Intent intent = new Intent();
+        //intent.setAction(Intent.ACTION_VIEW);
 
-        intent.setDataAndType(Uri.fromFile(file), "*/*"); //
-        PendingIntent pIntent = PendingIntent.getActivity(this, 0, intent, 0);
+        //intent.setDataAndType(Uri.fromFile(file), "*/*"); //
+
+
+        Uri sharedFileUri = FileProvider.getUriForFile(this, "com.example.notification.provider", file);
+        ShareCompat.IntentBuilder intentBuilder = ShareCompat.IntentBuilder.from(this).addStream(sharedFileUri);
+        PendingIntent pIntent = PendingIntent.getActivity(this, 0, intentBuilder.createChooserIntent(), 0);
         mBuilder = new NotificationCompat.Builder(this);
         mBuilder.setContentTitle("Download")
                 .setContentText("Download in progress")
@@ -120,8 +125,6 @@ import java.io.File;
              NotificationChannel channel = new NotificationChannel(channel_id, name, importance);
              channel.setDescription(description);
 
-             // Register the channel with the system; you can't change the importance
-             // or other notification behaviors after this
              NotificationManager notificationManager = getSystemService(NotificationManager.class);
              notificationManager.createNotificationChannel(channel);
          }
